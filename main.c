@@ -92,6 +92,8 @@ int main(void)
 
     struct Cell table[row][col];
 
+    /////////////// This needs to go into a function, called create table
+
     for (int i = 0; i < row; ++i)
     {
         for (int j = 0; j < col; ++j)
@@ -116,20 +118,43 @@ int main(void)
                 cell.lucky_card = cards[which_card];
             }
 
-            int cell_is_corridor = !(rand() % 10);
-            if (cell_is_corridor)
-            {
-                cell.is_corridor = 1;
-                int corridor_row = rand() % 7 + 1;
-                int corridor_col = rand() % 7 + 1;
-
-                cell.corridor_to[0] = corridor_row;
-                cell.corridor_to[1] = corridor_col;
-            }
-
             table[i][j] = cell;
         }
     }
+
+    for (int i = 0; i < row; ++i)
+    {
+        for (int j = 0; j < col; ++j)
+        {
+            struct Cell cell = table[i][j];
+
+            if (!cell.is_corridor)
+            {
+                int is_cell_corridor = !(rand() % 10);
+                if (is_cell_corridor)
+                {
+                    cell.is_corridor = TRUE;
+                    int corridor_row = rand() % 7 + 1;
+                    int corridor_col = rand() % 7 + 1;
+
+                    cell.corridor_to[0] = corridor_row;
+                    cell.corridor_to[1] = corridor_col;
+
+                    struct Cell pair_cell = table[corridor_row][corridor_col];
+                    pair_cell.is_corridor = TRUE;
+                    pair_cell.corridor_to[0] = i;
+                    pair_cell.corridor_to[1] = j;
+
+                    table[i][j] = cell;
+                    table[corridor_row][corridor_col] = pair_cell;
+                }
+            }
+        }
+    }
+
+    ///////////////
+
+    /////////////// This needs to go into a function, called print table
 
     for (int i = 0; i < row; ++i)
     {
