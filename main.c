@@ -18,7 +18,9 @@
 struct Player
 {
     char name[12];
-    int position[2];
+    int position_first_piece[2];
+    int position_second_piece[2];
+    enum Card lucky_card_list[10];
 };
 
 enum Card
