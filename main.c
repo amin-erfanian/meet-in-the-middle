@@ -42,6 +42,13 @@ struct Cell
     int corridor_to[2];
 };
 
+int dice()
+{
+    int dice_numbers[6] = {-3, -2, -1, 1, 2, 3};
+    int random_number = rand() % 6;
+    return dice_numbers[random_number];
+}
+
 void print_table(struct Cell table[row][col])
 {
     for (int i = 0; i < row; ++i)
