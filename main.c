@@ -2,6 +2,7 @@
 #include <string.h>
 #include <time.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_color.h>
@@ -12,16 +13,11 @@
 // gcc main.c -lallegro -lallegro_main -I /usr/local/include
 // gcc main.c -lglog -lceres -I /usr/local/include
 
+#define TRUE 1
+#define FALSE 0
+
 #define row 9
 #define col 9
-
-struct Player
-{
-    char name[12];
-    int position_first_piece[2];
-    int position_second_piece[2];
-    enum Card lucky_card_list[10];
-};
 
 enum Card
 {
@@ -29,6 +25,14 @@ enum Card
     multiply,
     limit,
     repeat_toss,
+};
+
+struct Player
+{
+    char name[12];
+    int position_first_piece[2];
+    int position_second_piece[2];
+    enum Card lucky_card_list[10];
 };
 
 struct Cell
@@ -41,6 +45,13 @@ struct Cell
     int is_corridor;
     int corridor_to[2];
 };
+
+int dice()
+{
+    int dice_numbers[6] = {-3, -2, -1, 1, 2, 3};
+    int random_number = rand() % 6;
+    return dice_numbers[random_number];
+}
 
 void print_table(struct Cell table[row][col])
 {
@@ -96,8 +107,8 @@ int main(void)
             if (i == 5 && j == 5)
                 cell.is_middle = 1;
 
-            int cell_is_not_lucky = rand() % 4;
-            if (!cell_is_not_lucky)
+            int cell_is_lucky = !(rand() % 5);
+            if (cell_is_lucky)
             {
                 cell.is_lucky = 1;
                 int which_card = rand() % 4;
@@ -105,8 +116,8 @@ int main(void)
                 cell.lucky_card = cards[which_card];
             }
 
-            int cell_is_not_corridor = rand() % 8;
-            if (!cell_is_not_corridor)
+            int cell_is_corridor = !(rand() % 10);
+            if (cell_is_corridor)
             {
                 cell.is_corridor = 1;
                 int corridor_row = rand() % 7 + 1;
