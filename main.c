@@ -12,11 +12,20 @@ struct Player
     int position[2];
 };
 
+enum Card
+{
+    closed_door,
+    multiply,
+    limit,
+    repeat_toss,
+};
+
 struct Cell
 {
     int row_index;
     int col_index;
     int is_lucky;
+    enum Card lucky_card;
     int is_middle;
     int is_corridor;
     int corridor_to[2];
@@ -70,7 +79,12 @@ int main(void)
 
             int cell_is_not_lucky = rand() % 4;
             if (!cell_is_not_lucky)
+            {
                 cell.is_lucky = 1;
+                int which_card = rand() % 4;
+                enum Card cards[4] = {closed_door, multiply, limit, repeat_toss};
+                cell.lucky_card = cards[which_card];
+            }
 
             int cell_is_not_corridor = rand() % 8;
             if (!cell_is_not_corridor)
@@ -92,7 +106,12 @@ int main(void)
         for (int j = 0; j < col; ++j)
         {
             struct Cell cell = table[i][j];
-            printf("[%d, %d] | is Middle? %d | is Lucky? %d | is Corridor? %d", cell.row_index, cell.col_index, cell.is_middle, cell.is_lucky, cell.is_corridor);
+            printf("[%d, %d] | is Middle? %d | is Lucky? %d", cell.row_index, cell.col_index, cell.is_middle, cell.is_lucky);
+            if (cell.is_lucky)
+            {
+                printf(" | Lucky card is [%d]", cell.lucky_card);
+            }
+            printf(" | is Corridor? %d", cell.is_corridor);
             if (cell.is_corridor)
             {
                 printf(" | Corridor to [%d, %d]\n", cell.corridor_to[0], cell.corridor_to[1]);
