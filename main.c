@@ -29,7 +29,7 @@ enum Card
 
 struct Player
 {
-    char name[12];
+    char name[50];
     int position_first_piece[2];
     int position_second_piece[2];
     enum Card lucky_card_list[10];
@@ -53,47 +53,8 @@ int dice()
     return dice_numbers[random_number];
 }
 
-void print_table(struct Cell table[row][col])
+void create_table(struct Cell table[row][col])
 {
-    for (int i = 0; i < row; ++i)
-    {
-        for (int j = 0; j < col; ++j)
-        {
-            struct Cell cell = table[i][j];
-            printf("[%d, %d] | is Middle? %d | is Lucky? %d | is Corridor? %d", cell.row_index, cell.col_index, cell.is_middle, cell.is_lucky, cell.is_corridor);
-            if (cell.is_corridor)
-            {
-                printf(" | Corridor to [%d, %d]\n", cell.corridor_to[i], cell.corridor_to[j]);
-            }
-            else
-            {
-                printf("\n");
-            }
-            if (j == col - 1)
-                printf("\n");
-        }
-    }
-}
-
-int main(void)
-{
-
-    srand(time(NULL));
-
-    al_init();
-    // al_init_font_addon();
-    // al_init_ttf_addon();
-
-    ALLEGRO_DISPLAY *display = al_create_display(400, 640);
-    // ALLEGRO_FONT *font = al_load_ttf_font("./ROBOTO.ttf", 64, 0);
-
-    struct Player player1;
-    struct Player player2;
-
-    struct Cell table[row][col];
-
-    /////////////// This needs to go into a function, called create table
-
     for (int i = 0; i < row; ++i)
     {
         for (int j = 0; j < col; ++j)
@@ -151,8 +112,72 @@ int main(void)
             }
         }
     }
+}
 
-    ///////////////
+void print_table(struct Cell table[row][col])
+{
+    for (int i = 0; i < row; ++i)
+    {
+        for (int j = 0; j < col; ++j)
+        {
+            struct Cell cell = table[i][j];
+            printf("[%d, %d] | is Middle? %d | is Lucky? %d", cell.row_index, cell.col_index, cell.is_middle, cell.is_lucky);
+            if (cell.is_lucky)
+            {
+                printf(" | Lucky card is [%d]", cell.lucky_card);
+            }
+            printf(" | is Corridor? %d", cell.is_corridor);
+            if (cell.is_corridor)
+            {
+                printf(" | Corridor to [%d, %d]\n", cell.corridor_to[0], cell.corridor_to[1]);
+            }
+            else
+            {
+                printf("\n");
+            }
+            if (j == col - 1)
+                printf("\n");
+        }
+    }
+}
+
+int main(void)
+{
+
+    srand(time(NULL));
+
+    al_init();
+    // al_init_font_addon();
+    // al_init_ttf_addon();
+
+    ALLEGRO_DISPLAY *display = al_create_display(400, 640);
+    // ALLEGRO_FONT *font = al_load_ttf_font("./ROBOTO.ttf", 64, 0);
+
+    struct Player player1;
+    struct Player player2;
+
+    do
+    {
+        printf("Enter name of player1: ");
+        scanf("%s", player1.name);
+        player1.position_first_piece[0] = 0;
+        player1.position_first_piece[1] = 0;
+        player1.position_second_piece[0] = 0;
+        player1.position_second_piece[1] = 0;
+
+        printf("Enter name of player2: ");
+        scanf("%s", player2.name);
+        player2.position_first_piece[0] = 8;
+        player2.position_first_piece[1] = 8;
+        player2.position_second_piece[0] = 8;
+        player2.position_second_piece[1] = 8;
+
+        !strcmp(player1.name, player2.name) ? printf("Enter names of different players!\n\n") : FALSE;
+    } while (!strcmp(player1.name, player2.name));
+
+    struct Cell table[row][col];
+
+    create_table(table);
 
     /////////////// This needs to go into a function, called print table
 
@@ -179,6 +204,10 @@ int main(void)
                 printf("\n");
         }
     }
+
+    printf("/n/n/n");
+
+    print_table(table);
 
     while (1)
     {
