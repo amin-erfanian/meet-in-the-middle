@@ -313,7 +313,7 @@ int main(void)
         printf("\n");
 
         is_someone_middle = check_for_win(player1, player2);
-
+        // TODO update alegro board (to be reminded)
         player_turn++;
     } while (!is_someone_middle);
 
