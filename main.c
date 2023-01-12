@@ -231,6 +231,10 @@ int main(void)
                             player1.lucky_card_list[player1.lucky_cards_count] = table[player1.position_first_piece].lucky_card;
                             player1.lucky_cards_count++;
                         }
+                        if (table[player1.position_first_piece].is_corridor)
+                        {
+                            player1.position_first_piece = table[player1.position_first_piece].corridor_to;
+                        }
                         break;
                     }
                     else
@@ -245,6 +249,10 @@ int main(void)
                         {
                             player1.lucky_card_list[player1.lucky_cards_count] = table[player1.position_second_piece].lucky_card;
                             player1.lucky_cards_count++;
+                        }
+                        if (table[player1.position_second_piece].is_corridor)
+                        {
+                            player1.position_second_piece = table[player1.position_second_piece].corridor_to;
                         }
                         break;
                     }
@@ -278,6 +286,10 @@ int main(void)
                             player2.lucky_card_list[player2.lucky_cards_count] = table[player2.position_first_piece].lucky_card;
                             player2.lucky_cards_count++;
                         }
+                        if (table[player2.position_first_piece].is_corridor)
+                        {
+                            player2.position_first_piece = table[player2.position_first_piece].corridor_to;
+                        }
                         break;
                     }
                     else
@@ -292,6 +304,10 @@ int main(void)
                         {
                             player2.lucky_card_list[player2.lucky_cards_count] = table[player2.position_second_piece].lucky_card;
                             player2.lucky_cards_count++;
+                        }
+                        if (table[player2.position_second_piece].is_corridor)
+                        {
+                            player2.position_second_piece = table[player2.position_second_piece].corridor_to;
                         }
                         break;
                     }
@@ -308,8 +324,8 @@ int main(void)
                 printf("You have no valid moves, try next round!\n");
         }
 
-        printf("player1 pieces position > 1: [%d] | 2: [%d]\n", player1.position_first_piece, player1.position_second_piece);
-        printf("player2 pieces position > 1: [%d] | 2: [%d]\n", player2.position_first_piece, player2.position_second_piece);
+        printf("%s's pieces: [%d] | [%d]\n", player1.name, player1.position_first_piece, player1.position_second_piece);
+        printf("%s's pieces: [%d] | [%d]\n", player2.name, player2.position_first_piece, player2.position_second_piece);
         printf("\n");
 
         is_someone_middle = check_for_win(player1, player2);
@@ -320,9 +336,9 @@ int main(void)
     if (is_someone_middle)
     {
         if (player_turn == 1)
-            printf("%s has won the game", player2.name);
+            printf("%s has won the game *.*;''**^\n", player1.name);
         else
-            printf("%s has won the game", player1.name);
+            printf("%s has won the game *.*;''**^\n", player2.name);
     }
 
     /////////////// This needs to go into a function, called print table
