@@ -34,6 +34,7 @@ struct Player
     int position_first_piece;
     int position_second_piece;
     enum Card lucky_card_list[10];
+    int lucky_cards_count;
 };
 
 struct Cell
@@ -53,12 +54,30 @@ int dice()
     return dice_numbers[random_number];
 }
 
+int player_can_move(int dice_number, struct Player player)
+{
+    if (player.position_first_piece + dice_number >= 0 && player.position_first_piece + dice_number < total)
+        return 1;
+    else if (player.position_second_piece + dice_number >= 0 && player.position_second_piece + dice_number < total)
+        return 1;
+    return 0;
+}
+
 int is_valid_move(int dice_number, int position)
 {
     if (position + dice_number >= 0 && position + dice_number < total)
         return 1;
     return 0;
 }
+
+// void move(int dice, struct Player player, struct Cell table[])
+// {
+//     player.position_first_piece += dice_number;
+//     if (table[player1.position_first_piece].is_lucky)
+//     {
+//         player1.lucky_card_list[player1.lucky_cards_count] = table[player1.position_first_piece].lucky_card;
+//     }
+// }
 
 int check_for_win(struct Player player1, struct Player player2)
 {
@@ -165,11 +184,13 @@ int main(void)
         scanf("%s", player1.name);
         player1.position_first_piece = 0;
         player1.position_second_piece = 0;
+        player1.lucky_cards_count = 0;
 
         printf("Enter name of player2: ");
         scanf("%s", player2.name);
         player2.position_first_piece = 80;
         player2.position_second_piece = 80;
+        player2.lucky_cards_count = 0;
 
         !strcmp(player1.name, player2.name) ? printf("Enter names of different players!\n\n") : FALSE;
     } while (!strcmp(player1.name, player2.name));
@@ -189,44 +210,102 @@ int main(void)
         int dice_number = dice();
         printf("%d\n", dice_number);
 
-        printf("Type which piece you want to move? (1 or 2)  ");
         int piece_number;
-        scanf("%d", &piece_number);
-        printf("\n");
 
         if (player_turn == 1)
         {
-            if (piece_number == 1)
+            while (player_can_move(dice_number, player1))
             {
-                if (is_valid_move(dice_number, player1.position_first_piece))
-                    player1.position_first_piece += dice_number;
+
+                printf("Type which piece you want to move? (1 or 2)  ");
+                scanf("%d", &piece_number);
+                printf("\n");
+
+                if (piece_number == 1)
+                {
+                    if (is_valid_move(dice_number, player1.position_first_piece))
+                    {
+                        player1.position_first_piece += dice_number;
+                        if (table[player1.position_first_piece].is_lucky)
+                        {
+                            player1.lucky_card_list[player1.lucky_cards_count] = table[player1.position_first_piece].lucky_card;
+                            player1.lucky_cards_count++;
+                        }
+                        break;
+                    }
+                    else
+                        printf("You can't movie this piece! please choose the other one..!\n");
+                }
+                else if (piece_number == 2)
+                {
+                    if (is_valid_move(dice_number, player1.position_second_piece))
+                    {
+                        player1.position_second_piece += dice_number;
+                        if (table[player1.position_second_piece].is_lucky)
+                        {
+                            player1.lucky_card_list[player1.lucky_cards_count] = table[player1.position_second_piece].lucky_card;
+                            player1.lucky_cards_count++;
+                        }
+                        break;
+                    }
+                    else
+                        printf("You can't movie this piece! please choose the other one..!\n");
+                }
                 else
-                    printf("This is an invalid move! wait for the next round!\n");
+                {
+                    printf("Wrong Selection... try again!\n");
+                }
             }
-            else if (piece_number == 2)
-            {
-                if (is_valid_move(dice_number, player1.position_second_piece))
-                    player1.position_second_piece += dice_number;
-                else
-                    printf("This is an invalid move! wait for the next round!\n");
-            }
+            if (!player_can_move(dice_number, player1))
+                printf("You have no valid moves, try next round!\n");
         }
         else if (player_turn == 2)
         {
-            if (piece_number == 1)
+            while (player_can_move(dice_number, player2))
             {
-                if (is_valid_move(dice_number, player2.position_first_piece))
-                    player2.position_first_piece += dice_number;
+
+                printf("Type which piece you want to move? (1 or 2)  ");
+                scanf("%d", &piece_number);
+                printf("\n");
+
+                if (piece_number == 1)
+                {
+                    if (is_valid_move(dice_number, player2.position_first_piece))
+                    {
+                        player2.position_first_piece += dice_number;
+                        if (table[player2.position_first_piece].is_lucky)
+                        {
+                            player2.lucky_card_list[player2.lucky_cards_count] = table[player2.position_first_piece].lucky_card;
+                            player2.lucky_cards_count++;
+                        }
+                        break;
+                    }
+                    else
+                        printf("You can't movie this piece! please choose the other one..!\n");
+                }
+                else if (piece_number == 2)
+                {
+                    if (is_valid_move(dice_number, player2.position_second_piece))
+                    {
+                        player2.position_second_piece += dice_number;
+                        if (table[player2.position_second_piece].is_lucky)
+                        {
+                            player2.lucky_card_list[player2.lucky_cards_count] = table[player2.position_second_piece].lucky_card;
+                            player2.lucky_cards_count++;
+                        }
+                        break;
+                    }
+                    else
+                        printf("You can't movie this piece! please choose the other one..!\n");
+                }
                 else
-                    printf("This is an invalid move! wait for the next round!\n");
+                {
+
+                    printf("Wrong Selection... try again!\n");
+                }
             }
-            else if (piece_number == 2)
-            {
-                if (is_valid_move(dice_number, player2.position_second_piece))
-                    player2.position_second_piece += dice_number;
-                else
-                    printf("This is an invalid move! wait for the next round!\n");
-            }
+            if (!player_can_move(dice_number, player2))
+                printf("You have no valid moves, try next round!\n");
         }
 
         printf("player1 pieces position > 1: [%d] | 2: [%d]\n", player1.position_first_piece, player1.position_second_piece);
@@ -237,6 +316,7 @@ int main(void)
 
         player_turn++;
     } while (!is_someone_middle);
+
     if (is_someone_middle)
     {
         if (player_turn == 1)
