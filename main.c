@@ -156,6 +156,8 @@ int main(void)
     struct Player player1;
     struct Player player2;
 
+    int player_turn = 1;
+
     do
     {
         printf("Enter name of player1: ");
@@ -174,6 +176,23 @@ int main(void)
 
         !strcmp(player1.name, player2.name) ? printf("Enter names of different players!\n\n") : FALSE;
     } while (!strcmp(player1.name, player2.name));
+
+    do
+    {
+        player_turn = ((player_turn % 2) ? 1 : 2);
+        if (player_turn == 1)
+            printf("dicing for %s:- ", player1.name);
+        else
+            printf("dicing for %s:- ", player2.name);
+
+        int dice_number = dice();
+        printf("%d\n", dice_number);
+
+        int new_i, new_j;
+        printf("Type new position that you want to be in");
+        scanf("%d %d", new_i, new_j);
+
+    } while (player1.position_first_piece[0] != 5 && player1.position_first_piece[1] != 5);
 
     struct Cell table[row][col];
 
