@@ -31,8 +31,7 @@ enum Card
 struct Player
 {
     char name[50];
-    int position_first_piece;
-    int position_second_piece;
+    int pieces[2];
     enum Card lucky_card_list[10];
     int lucky_cards_count;
 };
@@ -56,9 +55,9 @@ int dice()
 
 int player_can_move(int dice_number, struct Player player)
 {
-    if (player.position_first_piece + dice_number >= 0 && player.position_first_piece + dice_number < total)
+    if (player.pieces[0] + dice_number >= 0 && player.pieces[0] + dice_number < total)
         return 1;
-    else if (player.position_second_piece + dice_number >= 0 && player.position_second_piece + dice_number < total)
+    else if (player.pieces[1] + dice_number >= 0 && player.pieces[1] + dice_number < total)
         return 1;
     return 0;
 }
@@ -70,18 +69,31 @@ int is_valid_move(int dice_number, int position)
     return 0;
 }
 
-// void move(int dice, struct Player player, struct Cell table[])
-// {
-//     player.position_first_piece += dice_number;
-//     if (table[player1.position_first_piece].is_lucky)
-//     {
-//         player1.lucky_card_list[player1.lucky_cards_count] = table[player1.position_first_piece].lucky_card;
-//     }
-// }
+void move(int dice_number, struct Player *player, int piece_number, struct Cell table[])
+{
+
+    player->pieces[piece_number - 1] += dice_number;
+    if (table[player->pieces[piece_number - 1]].is_lucky)
+    {
+        player->lucky_card_list[player->lucky_cards_count] = table[player->pieces[piece_number - 1]].lucky_card;
+        player->lucky_cards_count++;
+        printf("Oh you got a lucky card! your cards now are as follow:\n");
+        for (int i = 0; i < player->lucky_cards_count; i++)
+        {
+            printf("|%d", player->lucky_card_list[i]);
+        }
+        printf("|\n");
+    }
+    if (table[player->pieces[piece_number - 1]].is_corridor)
+    {
+        printf("Oh you are in a corridor!\n");
+        player->pieces[piece_number - 1] = table[player->pieces[piece_number - 1]].corridor_to;
+    }
+}
 
 int check_for_win(struct Player player1, struct Player player2)
 {
-    if (player1.position_first_piece == 40 && player1.position_second_piece == 40 || player2.position_first_piece == 40 && player2.position_second_piece == 40)
+    if (player1.pieces[0] == 40 && player1.pieces[1] == 40 || player2.pieces[0] == 40 && player2.pieces[1] == 40)
         return 1;
 
     return 0;
@@ -182,14 +194,14 @@ int main(void)
     {
         printf("Enter name of player1: ");
         scanf("%s", player1.name);
-        player1.position_first_piece = 0;
-        player1.position_second_piece = 0;
+        player1.pieces[0] = 0;
+        player1.pieces[1] = 0;
         player1.lucky_cards_count = 0;
 
         printf("Enter name of player2: ");
         scanf("%s", player2.name);
-        player2.position_first_piece = 80;
-        player2.position_second_piece = 80;
+        player2.pieces[0] = 80;
+        player2.pieces[1] = 80;
         player2.lucky_cards_count = 0;
 
         !strcmp(player1.name, player2.name) ? printf("Enter names of different players!\n\n") : FALSE;
@@ -203,9 +215,9 @@ int main(void)
     {
         player_turn = ((player_turn % 2) ? 1 : 2);
         if (player_turn == 1)
-            printf("dicing for %s --- It's number ", player1.name);
+            printf("\ndicing for %s --- It's number ", player1.name);
         else
-            printf("dicing for %s --- it's number ", player2.name);
+            printf("\ndicing for %s --- it's number ", player2.name);
 
         int dice_number = dice();
         printf("%d\n", dice_number);
@@ -214,27 +226,20 @@ int main(void)
 
         if (player_turn == 1)
         {
+            if (!player_can_move(dice_number, player1))
+                printf("You have no valid moves, try next round!\n");
+
             while (player_can_move(dice_number, player1))
             {
 
                 printf("Type which piece you want to move? (1 or 2)  ");
                 scanf("%d", &piece_number);
-                printf("\n");
 
                 if (piece_number == 1)
                 {
-                    if (is_valid_move(dice_number, player1.position_first_piece))
+                    if (is_valid_move(dice_number, player1.pieces[0]))
                     {
-                        player1.position_first_piece += dice_number;
-                        if (table[player1.position_first_piece].is_lucky)
-                        {
-                            player1.lucky_card_list[player1.lucky_cards_count] = table[player1.position_first_piece].lucky_card;
-                            player1.lucky_cards_count++;
-                        }
-                        if (table[player1.position_first_piece].is_corridor)
-                        {
-                            player1.position_first_piece = table[player1.position_first_piece].corridor_to;
-                        }
+                        move(dice_number, &player1, piece_number, table);
                         break;
                     }
                     else
@@ -242,18 +247,9 @@ int main(void)
                 }
                 else if (piece_number == 2)
                 {
-                    if (is_valid_move(dice_number, player1.position_second_piece))
+                    if (is_valid_move(dice_number, player1.pieces[1]))
                     {
-                        player1.position_second_piece += dice_number;
-                        if (table[player1.position_second_piece].is_lucky)
-                        {
-                            player1.lucky_card_list[player1.lucky_cards_count] = table[player1.position_second_piece].lucky_card;
-                            player1.lucky_cards_count++;
-                        }
-                        if (table[player1.position_second_piece].is_corridor)
-                        {
-                            player1.position_second_piece = table[player1.position_second_piece].corridor_to;
-                        }
+                        move(dice_number, &player1, piece_number, table);
                         break;
                     }
                     else
@@ -264,32 +260,23 @@ int main(void)
                     printf("Wrong Selection... try again!\n");
                 }
             }
-            if (!player_can_move(dice_number, player1))
-                printf("You have no valid moves, try next round!\n");
         }
         else if (player_turn == 2)
         {
+            if (!player_can_move(dice_number, player2))
+                printf("You have no valid moves, try next round!\n");
+
             while (player_can_move(dice_number, player2))
             {
 
                 printf("Type which piece you want to move? (1 or 2)  ");
                 scanf("%d", &piece_number);
-                printf("\n");
 
                 if (piece_number == 1)
                 {
-                    if (is_valid_move(dice_number, player2.position_first_piece))
+                    if (is_valid_move(dice_number, player2.pieces[0]))
                     {
-                        player2.position_first_piece += dice_number;
-                        if (table[player2.position_first_piece].is_lucky)
-                        {
-                            player2.lucky_card_list[player2.lucky_cards_count] = table[player2.position_first_piece].lucky_card;
-                            player2.lucky_cards_count++;
-                        }
-                        if (table[player2.position_first_piece].is_corridor)
-                        {
-                            player2.position_first_piece = table[player2.position_first_piece].corridor_to;
-                        }
+                        move(dice_number, &player2, piece_number, table);
                         break;
                     }
                     else
@@ -297,18 +284,9 @@ int main(void)
                 }
                 else if (piece_number == 2)
                 {
-                    if (is_valid_move(dice_number, player2.position_second_piece))
+                    if (is_valid_move(dice_number, player2.pieces[1]))
                     {
-                        player2.position_second_piece += dice_number;
-                        if (table[player2.position_second_piece].is_lucky)
-                        {
-                            player2.lucky_card_list[player2.lucky_cards_count] = table[player2.position_second_piece].lucky_card;
-                            player2.lucky_cards_count++;
-                        }
-                        if (table[player2.position_second_piece].is_corridor)
-                        {
-                            player2.position_second_piece = table[player2.position_second_piece].corridor_to;
-                        }
+                        move(dice_number, &player2, piece_number, table);
                         break;
                     }
                     else
@@ -320,16 +298,13 @@ int main(void)
                     printf("Wrong Selection... try again!\n");
                 }
             }
-            if (!player_can_move(dice_number, player2))
-                printf("You have no valid moves, try next round!\n");
         }
 
-        printf("%s's pieces: [%d] | [%d]\n", player1.name, player1.position_first_piece, player1.position_second_piece);
-        printf("%s's pieces: [%d] | [%d]\n", player2.name, player2.position_first_piece, player2.position_second_piece);
-        printf("\n");
+        printf("%s's pieces: [%d] | [%d]\n", player1.name, player1.pieces[0], player1.pieces[1]);
+        printf("%s's pieces: [%d] | [%d]\n", player2.name, player2.pieces[0], player2.pieces[1]);
 
         is_someone_middle = check_for_win(player1, player2);
-        // TODO update alegro board (to be reminded)
+        // TODO update allegro board (to be reminded)
         player_turn++;
     } while (!is_someone_middle);
 
