@@ -81,7 +81,7 @@ int is_valid_move(int dice_number, int position)
 
 int check_for_win(struct Player player1, struct Player player2)
 {
-    if (player1.position_first_piece == 40 || player1.position_second_piece == 40 || player2.position_first_piece == 40 || player2.position_second_piece == 40)
+    if (player1.position_first_piece == 40 && player1.position_second_piece == 40 || player2.position_first_piece == 40 && player2.position_second_piece == 40)
         return 1;
 
     return 0;
